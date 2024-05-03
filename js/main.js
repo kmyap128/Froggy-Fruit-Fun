@@ -45,26 +45,9 @@ function setup() {
     stage.addChild(startScene);
 
     // game scene
-    background = new PIXI.Sprite(
-        PIXI.Texture.from("images/background.png")
-    );
-	// Set the background to cover the entire scene
-    // background.width = sceneWidth;
-    // background.height = sceneHeight;
-    // // Add the background as the first child of the stage
-    // stage.addChildAt(background, 0); // Add at index 0 to make it the background
     gameScene = new PIXI.Container();
     gameScene.visible = false;
     stage.addChild(gameScene);
-    // Create the Freddy sprite and make it visible
-    freddy = new Freddy(); // Assuming you have a class or function to create Freddy
-    freddy.visible = true; // Make sure Freddy is visible
-    gameScene.addChild(freddy);
-    // Position Freddy (optional, adjust based on your game logic)
-    freddy.x = 500;
-    freddy.y = 515;
-    window.addEventListener("keydown", moveFreddy);
-
 
     // game over scene
     gameOverScene = new PIXI.Container();
@@ -75,8 +58,7 @@ function setup() {
 
     function createButtonsAndLabels() {
         let buttonStyle = new PIXI.TextStyle({
-            fill: 0x000000,
-            background: 0xFFFFFF,
+            fill: 0xFFFFFF,
             fontSize: 48,
             fontFamily: "Verdana"
         })
@@ -98,21 +80,70 @@ function setup() {
         })
         instructionLabel2.y = 20;
         startScene.addChild(instructionLabel2);
+
+        let instructionLabel3 = new PIXI.Text("3. Collect glowing fruit for powerups.")
+        instructionLabel3.style = new PIXI.TextStyle({
+            fill: 0xFFFFFF,
+            fontSize: 20,
+            fontFamily: "Verdana",
+            stroke: 0xFF0000,
+        })
+        instructionLabel3.y = 40;
+        startScene.addChild(instructionLabel3);
+
+        let startButton = new PIXI.Text("Start");
+        startButton.style = buttonStyle;
+        startButton.x = 80;
+        startButton.y = sceneHeight - 100;
+        startButton.interactive = true;
+        startButton.buttonMode = true;
+        startButton.on("pointerup", startGame);
+        startButton.on("pointerover", e => e.target.alpha = 0.7);
+        startButton.on("pointerout", e => e.currentTarget.alpha = 1.0);
+        startScene.addChild(startButton);
     }
+
+
+    background = new PIXI.Sprite(
+        PIXI.Texture.from("images/background.png")
+    );
+    // Set the background to cover the entire scene
+    background.width = sceneWidth;
+    background.height = sceneHeight;
+    // Add the background as the first child of the stage
+    gameScene.addChildAt(background, 0); // Add at index 0 to make it the background
+    background.visible = true;
+
+    // Create the Freddy sprite and make it visible
+    freddy = new Freddy(); // Assuming you have a class or function to create Freddy
+    freddy.visible = true; // Make sure Freddy is visible
+    gameScene.addChild(freddy);
+    // Position Freddy
+    freddy.x = 500;
+    freddy.y = 515;
+    window.addEventListener("keydown", moveFreddy);
 }
+
+function startGame() {
+    startScene.visible = false;
+    gameOverScene.visible = false;
+    gameScene.visible = true;
+}
+
 
 function moveFreddy(event) {
-    switch(event.keyCode) {
-        case 37:
-            if(freddy.x > 0){
-                freddy.x -= MOVE_SPEED;
-                break;
-            }
-        case 39:
-            if(freddy.x < 1000){
-                freddy.x += MOVE_SPEED;
-                break;
-            }
+    if (gameScene.visible == true) {
+        switch(event.keyCode) {
+            case 37:
+                if(freddy.x > 0){
+                    freddy.x -= MOVE_SPEED;
+                    break;
+                }
+            case 39:
+                if(freddy.x < 1000){
+                    freddy.x += MOVE_SPEED;
+                    break;
+                }
+        }
     }
 }
-
