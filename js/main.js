@@ -23,11 +23,11 @@ app.loader.load();
 
 // game variables
 let stage;
-let background;
 let gameScene;
 let gameState;
 let startScene;
-let freddy,scoreLabel;
+let instructions;
+let background,freddy,scoreLabel;
 let gameOverScene;
 
 let fruits = [];
@@ -59,47 +59,19 @@ function setup() {
     function createButtonsAndLabels() {
         // Start Scene
         let buttonStyle = new PIXI.TextStyle({
-            fill: 0xFFFFFF,
+            fill: 0xFF0000,
             fontSize: 48,
             fontFamily: "Verdana"
         })
-        let instructionLabel1 = new PIXI.Text("1. Use Left and Right Arrow Keys to move left and right.");
-        instructionLabel1.style = new PIXI.TextStyle({
-            fill: 0xFFFFFF,
-            fontSize: 20,
-            fontFamily: "Verdana",
-            stroke: 0xFF0000,
-        })
-        startScene.addChild(instructionLabel1);
-
-        let instructionLabel2 = new PIXI.Text("2. Collect as many fruits as you can while avoiding the bees.")
-        instructionLabel2.style = new PIXI.TextStyle({
-            fill: 0xFFFFFF,
-            fontSize: 20,
-            fontFamily: "Verdana",
-            stroke: 0xFF0000,
-        })
-        instructionLabel2.y = 20;
-        startScene.addChild(instructionLabel2);
-
-        let instructionLabel3 = new PIXI.Text("3. Collect glowing fruit for powerups.")
-        instructionLabel3.style = new PIXI.TextStyle({
-            fill: 0xFFFFFF,
-            fontSize: 20,
-            fontFamily: "Verdana",
-            stroke: 0xFF0000,
-        })
-        instructionLabel3.y = 40;
-        startScene.addChild(instructionLabel3);
 
         let startButton = new PIXI.Text("Start");
         startButton.style = buttonStyle;
-        startButton.x = 80;
+        startButton.x = 800;
         startButton.y = sceneHeight - 100;
         startButton.interactive = true;
         startButton.buttonMode = true;
         startButton.on("pointerup", startGame);
-        startButton.on("pointerover", e => e.target.alpha = 0.7);
+        startButton.on("pointerover", e => e.target.alpha = 0.5);
         startButton.on("pointerout", e => e.currentTarget.alpha = 1.0);
         startScene.addChild(startButton);
 
@@ -129,6 +101,15 @@ function setup() {
         gameOverScene.addChild(gameOverText);
     }
 
+    instructions = new PIXI.Sprite(
+        PIXI.Texture.from("images/instructions.png")
+    );
+    // Set the background to cover the entire scene
+    instructions.width = sceneWidth;
+    instructions.height = sceneHeight;
+    // Add the background as the first child of the stage
+    startScene.addChildAt(instructions, 0); // Add at index 0 to make it the background
+    instructions.visible = true;
 
     background = new PIXI.Sprite(
         PIXI.Texture.from("images/background.png")
