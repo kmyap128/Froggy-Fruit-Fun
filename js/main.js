@@ -27,7 +27,7 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background,freddy,scoreLabel;
+let background,freddy,scoreLabel, fruitCreationTimer, fruitCreationInterval;
 let gameOverScene;
 
 let fruits = [];
@@ -135,6 +135,12 @@ function startGame() {
     startScene.visible = false;
     gameOverScene.visible = false;
     gameScene.visible = true;
+    score = 0;
+    increaseScoreBy(0);
+    freddy.x = 500;
+    freddy.y = 515;
+    window.addEventListener("keydown", moveFreddy);
+    loadGame();
 }
 
 
@@ -159,4 +165,28 @@ function moveFreddy(event) {
                 }
         }
     }
+}
+
+function loadGame() {
+
+    paused = false;
+}
+
+function gameLoop() {
+    if(paused) {
+        return;
+    }
+
+    let dt = 1/app.ticker.FPS;
+    if (dt > 1/12) dt=1/12;
+
+    
+
+}
+
+function createFruit() {
+    let fruit = new Fruit() 
+    fruit.x = Math.random() * (sceneWidth - 50) + 25;
+    fruits.push(fruit);
+    gameScene.addChild(fruit);
 }

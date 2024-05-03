@@ -12,10 +12,24 @@ class Freddy extends PIXI.Sprite {
 
 
 class Fruit extends PIXI.Graphics {
+    constructor(x=0, y=0){
+        super();
+        this.beginFill(0x000000);
+        this.drawCircle(0, 0, 10);
+        this.endFill();
+        this.x = x;
+        this.y = y;
+        this.speed = 50;
+        this.isCollected = false;
+        this.isAlive = true;
+    }
 
+    move(dt = 1/60) {
+        this.y += this.speed * dt;
+    }
 }
 
 
-class Bee extends PIXI.Graphics {
+// class Bee extends PIXI.Graphics {
 
-}
+// }
