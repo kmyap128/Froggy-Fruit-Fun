@@ -115,6 +115,18 @@ function setup() {
         scoreLabel.y = 5;
         gameScene.addChild(scoreLabel);
         increaseScoreBy(0);
+
+        // Game Over Scene
+        let gameOverText = new PIXI.Text("Game Over! The Blueberr-bees stole your fruits!");
+        textStyle = new PIXI.TextStyle({
+            fill: 0xFFFFFF,
+            fontSize: 64,
+            fontFamily: "Verdana",
+        })
+        gameOverText.style = textStyle;
+        gameOverText.x = 100;
+        gameOverText.y = sceneHeight/2 - 160;
+        gameOverScene.addChild(gameOverText);
     }
 
 
