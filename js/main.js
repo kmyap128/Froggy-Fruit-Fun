@@ -57,6 +57,7 @@ function setup() {
     createButtonsAndLabels();
 
     function createButtonsAndLabels() {
+        // Start Scene
         let buttonStyle = new PIXI.TextStyle({
             fill: 0xFFFFFF,
             fontSize: 48,
@@ -101,6 +102,19 @@ function setup() {
         startButton.on("pointerover", e => e.target.alpha = 0.7);
         startButton.on("pointerout", e => e.currentTarget.alpha = 1.0);
         startScene.addChild(startButton);
+
+        // Game Scene
+        let textStyle = new PIXI.TextStyle({
+            fill: 0x000000,
+            fontSize: 24,
+            fontFamily: "Verdana",
+        })
+        scoreLabel = new PIXI.Text();
+        scoreLabel.style = textStyle;
+        scoreLabel.x = 5;
+        scoreLabel.y = 5;
+        gameScene.addChild(scoreLabel);
+        increaseScoreBy(0);
     }
 
 
@@ -128,6 +142,12 @@ function startGame() {
     startScene.visible = false;
     gameOverScene.visible = false;
     gameScene.visible = true;
+}
+
+
+function increaseScoreBy(value){
+    score += value;
+    scoreLabel.text = `Score: ${score}`;
 }
 
 
