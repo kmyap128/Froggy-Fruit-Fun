@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Short+Stack&display=swap');
+
+*{
+    font-family: 'Short Stack', sans-serif;
+}
+
+body {
+    background-image: url(../images/Light_Mode.png);
+    background-size: 100%;
+}
+
+#wrapper {
+    margin: 50px;
+    padding: 50px;
+    background-color: rgba(255, 240, 240, 0.712);
+    border-radius: 20px;
+}
+
+#container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+img {
+    width: 500px;
+    margin: 10px;
+}
