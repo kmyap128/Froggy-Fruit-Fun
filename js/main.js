@@ -242,7 +242,12 @@ function gameLoop() {
     // create new fruits/powerups/bees at interval
     let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
     if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
-        if(fruitCount >= 5){
+        if (fruitCount % 5 == 0 && fruitCount != 0) {
+            createBee();
+            lastFruitCreationTime = performance.now();
+            fruitCount += 1;
+        }
+        else if(fruitCount == 12){
             createPowerup();
             lastFruitCreationTime = performance.now();
             fruitCount = 0;
@@ -273,7 +278,6 @@ function gameLoop() {
                         powerupStart.play();
                     }
                     else if(c.type == 'bee'){
-                        buzzSound.play();
                         end();
                     }
                     
@@ -281,9 +285,11 @@ function gameLoop() {
             if(c.y == sceneHeight){
                 c.isAlive = false;
                 gameScene.removeChild(c);
-                decreaseScoreBy(1);
-                if(score <= 0){
-                    end();
+                if(c.type == 'fruit'){
+                    decreaseScoreBy(1);
+                    if(score <= 0){
+                        end();
+                    }
                 }
             }
         }
@@ -310,6 +316,7 @@ function createBee(){
     bee.x = Math.random() * (sceneWidth - 50) + 25;
     collectibles.push(bee);
     gameScene.addChild(bee);
+    buzzSound.play();
 }
 
 function end() {
