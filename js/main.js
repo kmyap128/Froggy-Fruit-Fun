@@ -27,14 +27,13 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background, freddy, targetX, scoreLabel, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
+let background, freddy, targetX, scoreLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
 let gameOverScene, gameOverSound;
 
 let collectibles = [];
 let score = 0;
 let level = 0;
 let paused = true;
-let gameMusic = new Audio("sounds/background-music.mp3")
 
 // setup the game app
 function setup() {
@@ -177,6 +176,8 @@ function startGame() {
     freddy.y = 515;
     lastFruitCreationTime = performance.now();
     fruitCount = 0;
+    // background music initialized here so that the music restarts when the game restarts
+    gameMusic = new Audio("sounds/background-music.mp3");
     gameMusic.loop = true;
     gameMusic.play();
     loadGame();
