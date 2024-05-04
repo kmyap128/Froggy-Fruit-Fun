@@ -27,13 +27,14 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background,freddy,scoreLabel, fruitCreationTimer, fruitCreationInterval;
+let background, freddy, scoreLabel, collectedSound, fruitInterval, timeSinceLastFruit, lastFruitCreationTime ;
 let gameOverScene;
 
 let fruits = [];
 let powerups = [];
 let bees = [];
 let score = 0;
+let level = 0;
 let paused = true;
 
 
@@ -99,6 +100,17 @@ function setup() {
         gameOverText.x = 100;
         gameOverText.y = sceneHeight/2 - 160;
         gameOverScene.addChild(gameOverText);
+
+        let playAgainButton = new PIXI.Text("Play Again");
+        playAgainButton.style = buttonStyle;
+        playAgainButton.x = 150;
+        playAgainButton.y = sceneHeight - 100;
+        playAgainButton.interactive = true;
+        playAgainButton.buttonMode = true;
+        playAgainButton.on("pointerup",startGame); // startGame is a function reference
+        playAgainButton.on('pointerover',e=>e.target.alpha = 0.7); // concise arrow function with no brackets
+        playAgainButton.on('pointerout',e=>e.currentTarget.alpha = 1.0); // ditto
+        gameOverScene.addChild(playAgainButton);
     }
 
     instructions = new PIXI.Sprite(
@@ -129,6 +141,11 @@ function setup() {
     freddy.x = 500;
     freddy.y = 515;
     window.addEventListener("keydown", moveFreddy);
+    collectedSound = new Howl({
+        src: ['sounds/collect.mp3']
+    })
+    window.addEventListener("keydown", moveFreddy);
+    app.ticker.add(gameLoop);
 }
 
 function startGame() {
@@ -139,13 +156,18 @@ function startGame() {
     increaseScoreBy(0);
     freddy.x = 500;
     freddy.y = 515;
-    window.addEventListener("keydown", moveFreddy);
+    lastFruitCreationTime = performance.now();
     loadGame();
 }
 
 
 function increaseScoreBy(value){
     score += value;
+    scoreLabel.text = `Score: ${score}`;
+}
+
+function decreaseScoreBy(value){
+    score -= value;
     scoreLabel.text = `Score: ${score}`;
 }
 
@@ -168,7 +190,6 @@ function moveFreddy(event) {
 }
 
 function loadGame() {
-
     paused = false;
 }
 
@@ -180,8 +201,34 @@ function gameLoop() {
     let dt = 1/app.ticker.FPS;
     if (dt > 1/12) dt=1/12;
 
-    
+    fruitInterval = 2 - (level/10);
 
+    let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
+    if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
+        createFruit();
+        lastFruitCreationTime = performance.now(); // Update timestamp
+    }
+
+    for(let f of fruits) {
+        if(f.isAlive){
+            f.move()
+        if(f.y <= freddy.y && f.y >= freddy.y - 20 )
+            if(f.x <= freddy.x + 50 && f.x >= freddy.x - 50){
+                gameScene.removeChild(f);
+                f.isAlive = false;
+                collectedSound.play();
+                increaseScoreBy(1);
+                if(score % 10 == 0) {
+                    level += 1;
+                }
+        }
+        if(f.y == sceneHeight){
+            f.isAlive = false;
+            gameScene.removeChild(f);
+            decreaseScoreBy(1);
+        }
+        }
+    }
 }
 
 function createFruit() {

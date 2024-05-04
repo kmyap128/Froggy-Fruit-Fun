@@ -19,13 +19,12 @@ class Fruit extends PIXI.Graphics {
         this.endFill();
         this.x = x;
         this.y = y;
-        this.speed = 50;
-        this.isCollected = false;
+        this.speed = 5;
         this.isAlive = true;
     }
 
-    move(dt = 1/60) {
-        this.y += this.speed * dt;
+    move() {
+        this.y += this.speed;
     }
 }
 
