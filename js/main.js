@@ -90,7 +90,7 @@ function setup() {
         increaseScoreBy(0);
 
         // Game Over Scene
-        let gameOverText = new PIXI.Text("Game Over! The Blueberr-bees stole your fruits!");
+        let gameOverText = new PIXI.Text("Game Over!");
         textStyle = new PIXI.TextStyle({
             fill: 0xFFFFFF,
             fontSize: 64,
