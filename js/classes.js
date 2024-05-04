@@ -28,6 +28,10 @@ class Fruit extends PIXI.Graphics {
     }
 }
 
+// class PowerUp extends PIXI.Graphics {
+    
+// }
+
 
 // class Bee extends PIXI.Graphics {
 

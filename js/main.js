@@ -28,7 +28,7 @@ let gameState;
 let startScene;
 let instructions;
 let background, freddy, scoreLabel, collectedSound, fruitInterval, timeSinceLastFruit, lastFruitCreationTime ;
-let gameOverScene;
+let gameOverScene, gameOverSound;
 
 let fruits = [];
 let powerups = [];
@@ -36,6 +36,7 @@ let bees = [];
 let score = 0;
 let level = 0;
 let paused = true;
+let gameMusic = new Audio("sounds/background-music.mp3")
 
 
 function setup() {
@@ -144,6 +145,10 @@ function setup() {
     collectedSound = new Howl({
         src: ['sounds/collect.mp3']
     })
+
+    gameOverSound = new Howl({
+        src: ['sounds/game-over.mp3']
+    })
     window.addEventListener("keydown", moveFreddy);
     app.ticker.add(gameLoop);
 }
@@ -157,6 +162,8 @@ function startGame() {
     freddy.x = 500;
     freddy.y = 515;
     lastFruitCreationTime = performance.now();
+    gameMusic.loop = true;
+    gameMusic.play();
     loadGame();
 }
 
@@ -226,7 +233,7 @@ function gameLoop() {
             f.isAlive = false;
             gameScene.removeChild(f);
             decreaseScoreBy(1);
-            if(score == 0){
+            if(score <= 0){
                 end();
             }
         }
@@ -243,9 +250,12 @@ function createFruit() {
 
 function end() {
     paused = true;
+    gameOverSound.play();
 
     fruits.forEach(f => gameScene.removeChild(f));
     fruits = [];
+
+    gameMusic.pause();
 
     gameOverScene.visible = true;
     gameScene.visible = false;
