@@ -226,6 +226,9 @@ function gameLoop() {
             f.isAlive = false;
             gameScene.removeChild(f);
             decreaseScoreBy(1);
+            if(score == 0){
+                end();
+            }
         }
         }
     }
@@ -236,4 +239,14 @@ function createFruit() {
     fruit.x = Math.random() * (sceneWidth - 50) + 25;
     fruits.push(fruit);
     gameScene.addChild(fruit);
+}
+
+function end() {
+    paused = true;
+
+    fruits.forEach(f => gameScene.removeChild(f));
+    fruits = [];
+
+    gameOverScene.visible = true;
+    gameScene.visible = false;
 }
