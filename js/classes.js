@@ -33,6 +33,7 @@ class Fruit extends Collectible {
         this.beginFill(0x0000FF);
         this.drawCircle(0, 0, 10);
         this.endFill();
+        this.type = 'fruit';
     }
 }
 
@@ -42,6 +43,7 @@ class PowerUp extends Collectible {
         this.beginFill(0xFF0000);
         this.drawCircle(0, 0, 10);
         this.endFill();
+        this.type = 'powerup';
         this.powerups = ['magnet', 'immune', 'speed']; // Assuming these are classes or values defined elsewhere
         this.power = this.selectRandomPower();
     }
@@ -59,5 +61,6 @@ class Bee extends Collectible {
         this.beginFill(0xFFFF00);
         this.drawCircle(0, 0, 10);
         this.endFill();
+        this.type = 'bee';
     }
 }

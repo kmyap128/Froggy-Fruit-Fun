@@ -30,9 +30,7 @@ let instructions;
 let background, freddy, targetX, scoreLabel, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
 let gameOverScene, gameOverSound;
 
-let fruits = [];
-let powerups = [];
-let bees = [];
+let collectibles = [];
 let score = 0;
 let level = 0;
 let paused = true;
@@ -244,8 +242,7 @@ function gameLoop() {
     // create new fruits/powerups/bees at interval
     let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
     if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
-        if(fruitCount == 5){
-            console.log("powerup");
+        if(fruitCount == 15){
             createPowerup();
             lastFruitCreationTime = performance.now();
             fruitCount = 0;
@@ -258,22 +255,32 @@ function gameLoop() {
     }
 
     // loop through fruits to check for interaction
-    for(let f of fruits) {
-        if(f.isAlive){
-            f.move()
-            if(f.y <= freddy.y && f.y >= freddy.y - 20 )
-                if(f.x <= freddy.x + 50 && f.x >= freddy.x - 50){
-                    gameScene.removeChild(f);
-                    f.isAlive = false;
-                    collectedSound.play();
-                    increaseScoreBy(1);
-                    if(score % 10 == 0) {
-                        level += 2;
+    for(let c of collectibles) {
+        if(c.isAlive){
+            c.move()
+            if(c.y <= freddy.y && c.y >= freddy.y - 20 )
+                if(c.x <= freddy.x + 50 && c.x >= freddy.x - 50){
+                    gameScene.removeChild(c);
+                    c.isAlive = false;
+                    if(c.type == 'fruit'){
+                        collectedSound.play();
+                        increaseScoreBy(1);
+                        if(score % 10 == 0) {
+                            level += 2;
+                        }
                     }
+                    else if(c.type == 'powerup'){
+                        powerupStart.play();
+                    }
+                    else if(c.type == 'bee'){
+                        buzzSound.play();
+                        end();
+                    }
+                    
             }
-            if(f.y == sceneHeight){
-                f.isAlive = false;
-                gameScene.removeChild(f);
+            if(c.y == sceneHeight){
+                c.isAlive = false;
+                gameScene.removeChild(c);
                 decreaseScoreBy(1);
                 if(score <= 0){
                     end();
@@ -281,35 +288,36 @@ function gameLoop() {
             }
         }
     }
-    fruits = fruits.filter(f => f.isAlive);
+    collectibles = collectibles.filter(c => c.isAlive);
 }
 
 function createFruit() {
     let fruit = new Fruit(); 
     fruit.x = Math.random() * (sceneWidth - 50) + 25;
-    fruits.push(fruit);
+    collectibles.push(fruit);
     gameScene.addChild(fruit);
 }
 
 function createPowerup(){
     let powerup = new PowerUp();
     powerup.x = Math.random * (sceneWidth - 50) + 25;
-    powerups.push(powerup);
+    collectibles.push(powerup);
     gameScene.addChild(powerup);
+}
+
+function createBee(){
+    let bee = new Bee();
+    bee.x = Math.random * (sceneWidth - 50) + 25;
+    collectibles.push(bee);
+    gameScene.addChild(bee);
 }
 
 function end() {
     paused = true;
     gameOverSound.play();
 
-    fruits.forEach(f => gameScene.removeChild(f));
-    fruits = [];
-
-    powerups.forEach(p => gameScene.removeChild(p));
-    powerups = [];
-
-    bees.forEach(pb => gameScene.removeChild(b));
-    bees = [];
+    collectibles.forEach(c => gameScene.removeChild(c));
+    collectibles = [];
 
     gameMusic.pause();
 
