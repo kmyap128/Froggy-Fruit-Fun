@@ -27,7 +27,7 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background, freddy, scoreLabel, collectedSound, fruitInterval, timeSinceLastFruit, lastFruitCreationTime ;
+let background, freddy, scoreLabel, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
 let gameOverScene, gameOverSound;
 
 let fruits = [];
@@ -146,6 +146,18 @@ function setup() {
         src: ['sounds/collect.mp3']
     })
 
+    buzzSound = new Howl({
+        src: ['sounds/buzz.mp3']
+    })
+
+    powerupStart = new Howl({
+        src: ['sounds/start-powerup.mp3']
+    })
+
+    powerupEnd = new Howl({
+        src: ['sounds/end-powerup.mp3']
+    })
+
     gameOverSound = new Howl({
         src: ['sounds/game-over.mp3']
     })
@@ -162,6 +174,7 @@ function startGame() {
     freddy.x = 500;
     freddy.y = 515;
     lastFruitCreationTime = performance.now();
+    fruitCount = 0;
     gameMusic.loop = true;
     gameMusic.play();
     loadGame();
@@ -212,40 +225,79 @@ function gameLoop() {
 
     let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
     if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
-        createFruit();
-        lastFruitCreationTime = performance.now(); // Update timestamp
+        if(fruitCount == 5){
+            console.log("powerup");
+            createPowerup();
+            lastFruitCreationTime = performance.now();
+            fruitCount = 0;
+        }
+        else{
+            createFruit();
+            lastFruitCreationTime = performance.now(); // Update timestamp
+            fruitCount += 1;
+        }
     }
 
     for(let f of fruits) {
         if(f.isAlive){
             f.move()
-        if(f.y <= freddy.y && f.y >= freddy.y - 20 )
-            if(f.x <= freddy.x + 50 && f.x >= freddy.x - 50){
-                gameScene.removeChild(f);
+            if(f.y <= freddy.y && f.y >= freddy.y - 20 )
+                if(f.x <= freddy.x + 50 && f.x >= freddy.x - 50){
+                    gameScene.removeChild(f);
+                    f.isAlive = false;
+                    collectedSound.play();
+                    increaseScoreBy(1);
+                    if(score % 10 == 0) {
+                        level += 1;
+                    }
+            }
+            if(f.y == sceneHeight){
                 f.isAlive = false;
-                collectedSound.play();
-                increaseScoreBy(1);
-                if(score % 10 == 0) {
-                    level += 1;
+                gameScene.removeChild(f);
+                decreaseScoreBy(1);
+                if(score <= 0){
+                    end();
                 }
-        }
-        if(f.y == sceneHeight){
-            f.isAlive = false;
-            gameScene.removeChild(f);
-            decreaseScoreBy(1);
-            if(score <= 0){
-                end();
             }
         }
+    }
+    for (let p of powerups){
+        if(p.isAlive){
+            p.move();
+            if(p.y <= freddy.y && p.y >= freddy.y - 20 )
+                if(p.x <= freddy.x + 50 && p.x >= freddy.x - 50){
+                    gameScene.removeChild(p);
+                    p.isAlive = false;
+                    powerupStart.play();
+                    increaseScoreBy(1);
+                    if(score % 10 == 0) {
+                        level += 1;
+                    }
+            }
+            if(p.y == sceneHeight){
+                p.isAlive = false;
+                gameScene.removeChild(p);
+                decreaseScoreBy(1);
+                if(score <= 0){
+                    end();
+                }
+            }
         }
     }
 }
 
 function createFruit() {
-    let fruit = new Fruit() 
+    let fruit = new Fruit(); 
     fruit.x = Math.random() * (sceneWidth - 50) + 25;
     fruits.push(fruit);
     gameScene.addChild(fruit);
+}
+
+function createPowerup(){
+    let powerup = new PowerUp();
+    powerup.x = Math.random * (sceneWidth - 50) + 25;
+    powerups.push(powerup);
+    gameScene.addChild(powerup);
 }
 
 function end() {
@@ -254,6 +306,12 @@ function end() {
 
     fruits.forEach(f => gameScene.removeChild(f));
     fruits = [];
+
+    powerups.forEach(p => gameScene.removeChild(p));
+    powerups = [];
+
+    bees.forEach(pb => gameScene.removeChild(b));
+    bees = [];
 
     gameMusic.pause();
 

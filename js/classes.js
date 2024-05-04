@@ -28,9 +28,21 @@ class Fruit extends PIXI.Graphics {
     }
 }
 
-// class PowerUp extends PIXI.Graphics {
+class PowerUp extends Fruit {
+    constructor(x=0, y=0) {
+        super();
+        this.beginFill(0xFF0000);
+        this.drawCircle(0, 0, 10);
+        this.endFill();
+        this.powerups = ['magnet', 'immune', 'speed']; // Assuming these are classes or values defined elsewhere
+        this.power = this.selectRandomPower();
+    }
     
-// }
+    selectRandomPower() {
+        const randomIndex = Math.floor(Math.random() * this.powerups.length);
+        return this.powerups[randomIndex];
+    } 
+}
 
 
 // class Bee extends PIXI.Graphics {
