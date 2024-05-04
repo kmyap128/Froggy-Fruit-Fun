@@ -10,8 +10,7 @@ class Freddy extends PIXI.Sprite {
     }
 }
 
-
-class Fruit extends PIXI.Graphics {
+class Collectible extends PIXI.Graphics {
     constructor(x=0, y=0){
         super();
         this.beginFill(0x000000);
@@ -28,7 +27,16 @@ class Fruit extends PIXI.Graphics {
     }
 }
 
-class PowerUp extends Fruit {
+class Fruit extends Collectible {
+    constructor(x=0, y=0) {
+        super();
+        this.beginFill(0x0000FF);
+        this.drawCircle(0, 0, 10);
+        this.endFill();
+    }
+}
+
+class PowerUp extends Collectible {
     constructor(x=0, y=0) {
         super();
         this.beginFill(0xFF0000);
@@ -45,6 +53,11 @@ class PowerUp extends Fruit {
 }
 
 
-// class Bee extends PIXI.Graphics {
-
-// }
+class Bee extends Collectible {
+    constructor(x=0, y=0) {
+        super();
+        this.beginFill(0xFFFF00);
+        this.drawCircle(0, 0, 10);
+        this.endFill();
+    }
+}

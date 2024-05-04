@@ -27,7 +27,7 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background, freddy, scoreLabel, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
+let background, freddy, targetX, scoreLabel, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
 let gameOverScene, gameOverSound;
 
 let fruits = [];
@@ -38,7 +38,7 @@ let level = 0;
 let paused = true;
 let gameMusic = new Audio("sounds/background-music.mp3")
 
-
+// setup the game app
 function setup() {
     stage = app.stage;
 
@@ -141,7 +141,10 @@ function setup() {
     // Position Freddy
     freddy.x = 500;
     freddy.y = 515;
+    targetX = freddy.x;
     window.addEventListener("keydown", moveFreddy);
+
+    // initialize sounds
     collectedSound = new Howl({
         src: ['sounds/collect.mp3']
     })
@@ -165,6 +168,7 @@ function setup() {
     app.ticker.add(gameLoop);
 }
 
+// start the game and initialize vars
 function startGame() {
     startScene.visible = false;
     gameOverScene.visible = false;
@@ -180,39 +184,51 @@ function startGame() {
     loadGame();
 }
 
-
+// increase the score
 function increaseScoreBy(value){
     score += value;
     scoreLabel.text = `Score: ${score}`;
 }
 
+// decrease the score
 function decreaseScoreBy(value){
     score -= value;
     scoreLabel.text = `Score: ${score}`;
 }
 
-
+// takes user key input from arrow keys to change freddy's position
 function moveFreddy(event) {
     if (gameScene.visible == true) {
         switch(event.keyCode) {
             case 37:
                 if(freddy.x > 0){
-                    freddy.x -= MOVE_SPEED;
+                    targetX = Math.max(0, freddy.x - MOVE_SPEED);
                     break;
                 }
             case 39:
                 if(freddy.x < 1000){
-                    freddy.x += MOVE_SPEED;
+                    targetX = Math.min(1000, freddy.x + MOVE_SPEED);
                     break;
                 }
         }
     }
 }
 
+// smoothly updates freddy's position
+function updateX() {
+    if (freddy.x !== targetX) {
+        let distance = targetX - freddy.x;
+        let movement = Math.sign(distance) * Math.min(Math.abs(distance), MOVE_SPEED);
+        freddy.x += movement;
+    }
+}
+
+// load and start the gameplay
 function loadGame() {
     paused = false;
 }
 
+// loops gameplay until the game ends
 function gameLoop() {
     if(paused) {
         return;
@@ -221,8 +237,11 @@ function gameLoop() {
     let dt = 1/app.ticker.FPS;
     if (dt > 1/12) dt=1/12;
 
+    updateX();
+
     fruitInterval = 2 - (level/10);
 
+    // create new fruits/powerups/bees at interval
     let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
     if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
         if(fruitCount == 5){
@@ -238,6 +257,7 @@ function gameLoop() {
         }
     }
 
+    // loop through fruits to check for interaction
     for(let f of fruits) {
         if(f.isAlive){
             f.move()
@@ -248,7 +268,7 @@ function gameLoop() {
                     collectedSound.play();
                     increaseScoreBy(1);
                     if(score % 10 == 0) {
-                        level += 1;
+                        level += 2;
                     }
             }
             if(f.y == sceneHeight){
@@ -261,29 +281,7 @@ function gameLoop() {
             }
         }
     }
-    for (let p of powerups){
-        if(p.isAlive){
-            p.move();
-            if(p.y <= freddy.y && p.y >= freddy.y - 20 )
-                if(p.x <= freddy.x + 50 && p.x >= freddy.x - 50){
-                    gameScene.removeChild(p);
-                    p.isAlive = false;
-                    powerupStart.play();
-                    increaseScoreBy(1);
-                    if(score % 10 == 0) {
-                        level += 1;
-                    }
-            }
-            if(p.y == sceneHeight){
-                p.isAlive = false;
-                gameScene.removeChild(p);
-                decreaseScoreBy(1);
-                if(score <= 0){
-                    end();
-                }
-            }
-        }
-    }
+    fruits = fruits.filter(f => f.isAlive);
 }
 
 function createFruit() {
