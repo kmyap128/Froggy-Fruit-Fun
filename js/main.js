@@ -242,7 +242,7 @@ function gameLoop() {
     // create new fruits/powerups/bees at interval
     let timeSinceLastFruit = (performance.now() - lastFruitCreationTime) / 1000;
     if (timeSinceLastFruit >= fruitInterval) { // Create fruit every 2 seconds
-        if(fruitCount == 15){
+        if(fruitCount >= 5){
             createPowerup();
             lastFruitCreationTime = performance.now();
             fruitCount = 0;
@@ -300,14 +300,14 @@ function createFruit() {
 
 function createPowerup(){
     let powerup = new PowerUp();
-    powerup.x = Math.random * (sceneWidth - 50) + 25;
+    powerup.x = Math.random() * (sceneWidth - 50) + 25;
     collectibles.push(powerup);
     gameScene.addChild(powerup);
 }
 
 function createBee(){
     let bee = new Bee();
-    bee.x = Math.random * (sceneWidth - 50) + 25;
+    bee.x = Math.random() * (sceneWidth - 50) + 25;
     collectibles.push(bee);
     gameScene.addChild(bee);
 }
