@@ -13,7 +13,10 @@ const MOVE_SPEED = 20;
 app.loader
   .add([
     "images/background.png",
-    "images/freddy.png"
+    "images/freddy.png",
+    "images/fruit.png",
+    "images/powerup.png",
+    "images/bee.png"
     ]);
 app.loader.onProgress.add(e => console.log(`progress=${e.progress}`));
 app.loader.onComplete.add(setup);
@@ -27,7 +30,7 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background, freddy, targetX, scoreLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, fruitCount;
+let background, freddy, targetX, scoreLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, powerupStartTime, powerupTimer, fruitCount;
 let gameOverScene, gameOverSound;
 
 let collectibles = [];
@@ -267,8 +270,8 @@ function gameLoop() {
             if(c.y <= freddy.y && c.y >= freddy.y - 20 )
                 if(c.x <= freddy.x + 50 && c.x >= freddy.x - 50){
                     gameScene.removeChild(c);
-                    c.isAlive = false;
                     if(c.type == 'fruit'){
+                        c.isAlive = false;
                         collectedSound.play();
                         increaseScoreBy(1);
                         if(score % 10 == 0) {
@@ -277,11 +280,12 @@ function gameLoop() {
                     }
                     else if(c.type == 'powerup'){
                         powerupStart.play();
+                        powerupStartTime = performance.now();
+                        c.activated = true;
                     }
                     else if(c.type == 'bee'){
                         end();
                     }
-                    
             }
             if(c.y == sceneHeight){
                 c.isAlive = false;
@@ -291,6 +295,13 @@ function gameLoop() {
                     if(score <= 0){
                         end();
                     }
+                }
+            }
+            if(c.type == 'powerup') {
+                if(c.activated == true && (performance.now() - powerupStartTime)/1000 >= 10){
+                    powerupEnd.play();
+                    c.isAlive = false;
+                    c.activated = false;
                 }
             }
         }
