@@ -30,11 +30,12 @@ let gameScene;
 let gameState;
 let startScene;
 let instructions;
-let background, freddy, targetX, scoreLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, powerupStartTime, powerupTimer, fruitCount;
+let background, freddy, targetX, scoreLabel, droppedFruitsLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, powerupStartTime, powerupTimer, fruitCount;
 let gameOverScene, gameOverSound;
 
 let collectibles = [];
 let score = 0;
+let dropped = 0;
 let level = 0;
 let paused = true;
 
@@ -89,6 +90,13 @@ function setup() {
         scoreLabel.y = 5;
         gameScene.addChild(scoreLabel);
         increaseScoreBy(0);
+
+        droppedFruitsLabel = new PIXI.Text();
+        droppedFruitsLabel.style = textStyle;
+        droppedFruitsLabel.x = 5;
+        droppedFruitsLabel.y = 30;
+        gameScene.addChild(droppedFruitsLabel);
+        increasedDroppedBy(0);
 
         // Game Over Scene
         let gameOverText = new PIXI.Text("Game Over!");
@@ -174,7 +182,9 @@ function startGame() {
     gameOverScene.visible = false;
     gameScene.visible = true;
     score = 0;
+    dropped = 0;
     increaseScoreBy(0);
+    increasedDroppedBy(0);
     freddy.x = 500;
     freddy.y = 515;
     lastFruitCreationTime = performance.now();
@@ -192,10 +202,9 @@ function increaseScoreBy(value){
     scoreLabel.text = `Score: ${score}`;
 }
 
-// decrease the score
-function decreaseScoreBy(value){
-    score -= value;
-    scoreLabel.text = `Score: ${score}`;
+function increasedDroppedBy(value) {
+    dropped += value;
+    droppedFruitsLabel.text = `Dropped Fruits: ${dropped}`;
 }
 
 // takes user key input from arrow keys to change freddy's position
@@ -291,8 +300,8 @@ function gameLoop() {
                 c.isAlive = false;
                 gameScene.removeChild(c);
                 if(c.type == 'fruit'){
-                    decreaseScoreBy(1);
-                    if(score <= 0){
+                    increasedDroppedBy(1);
+                    if(dropped >= 5){
                         end();
                     }
                 }
