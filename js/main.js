@@ -31,13 +31,16 @@ let gameState;
 let startScene;
 let instructions;
 let background, freddy, targetX, scoreLabel, droppedFruitsLabel, gameMusic, collectedSound, buzzSound, powerupStart, powerupEnd, fruitInterval, timeSinceLastFruit, lastFruitCreationTime, powerupStartTime, powerupTimer, fruitCount;
-let gameOverScene, gameOverSound;
+let gameOverScene, gameOverSound, finalScore, highScore;
 
 let collectibles = [];
 let score = 0;
 let dropped = 0;
 let level = 0;
+let range = 0;
 let paused = true;
+let highScoreID = "kby1440-highScore";
+let highestScore = 0;
 
 // setup the game app
 function setup() {
@@ -78,8 +81,21 @@ function setup() {
         startButton.on("pointerout", e => e.currentTarget.alpha = 1.0);
         startScene.addChild(startButton);
 
-        // Game Scene
+        highestScore = localStorage.getItem(highScoreID);
+
+        highScore = new PIXI.Text(`High Score: ${highestScore}`);
         let textStyle = new PIXI.TextStyle({
+            fill: 0xF0F0F0,
+            fontSize: 36,
+            fontFamily: "Verdana",
+        })
+        highScore.style = textStyle;
+        highScore.x = 675;
+        highScore.y = sceneHeight - 150;
+        startScene.addChild(highScore);
+
+        // Game Scene
+        textStyle = new PIXI.TextStyle({
             fill: 0x000000,
             fontSize: 24,
             fontFamily: "Verdana",
@@ -109,6 +125,7 @@ function setup() {
         gameOverText.x = 100;
         gameOverText.y = sceneHeight/2 - 160;
         gameOverScene.addChild(gameOverText);
+
 
         let playAgainButton = new PIXI.Text("Play Again");
         playAgainButton.style = buttonStyle;
@@ -274,10 +291,18 @@ function gameLoop() {
 
     // loop through fruits to check for interaction
     for(let c of collectibles) {
+        if(c.type == 'powerup') {
+            if(c.activated == true && (performance.now() - powerupStartTime)/1000 >= 10){
+                powerupEnd.play();
+                c.isAlive = false;
+                c.activated = false;
+                range = 0;
+            }
+        }
         if(c.isAlive){
             c.move()
-            if(c.y <= freddy.y && c.y >= freddy.y - 20 )
-                if(c.x <= freddy.x + 50 && c.x >= freddy.x - 50){
+            if(c.y <= freddy.y + range && c.y >= freddy.y - 20 )
+                if(c.x <= freddy.x + 50 + range && c.x >= freddy.x - 50 - range){
                     gameScene.removeChild(c);
                     if(c.type == 'fruit'){
                         c.isAlive = false;
@@ -291,6 +316,7 @@ function gameLoop() {
                         powerupStart.play();
                         powerupStartTime = performance.now();
                         c.activated = true;
+                        range = 100;
                     }
                     else if(c.type == 'bee'){
                         end();
@@ -304,13 +330,6 @@ function gameLoop() {
                     if(dropped >= 5){
                         end();
                     }
-                }
-            }
-            if(c.type == 'powerup') {
-                if(c.activated == true && (performance.now() - powerupStartTime)/1000 >= 10){
-                    powerupEnd.play();
-                    c.isAlive = false;
-                    c.activated = false;
                 }
             }
         }
@@ -340,6 +359,10 @@ function createBee(){
     buzzSound.play();
 }
 
+function saveHighestScore(score){
+    localStorage.setItem(highScoreID, JSON.stringify(score))
+}
+
 function end() {
     paused = true;
     gameOverSound.play();
@@ -348,6 +371,12 @@ function end() {
     collectibles = [];
 
     gameMusic.pause();
+
+
+    if(score > highestScore){
+        highestScore = score;
+        saveHighestScore(highestScore);
+    }
 
     gameOverScene.visible = true;
     gameScene.visible = false;
